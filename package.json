@@ -1,0 +1,19 @@
+{
+  "name": "echidna",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/helltaker-hangout/echidna.git"
+  },
+  "author": "HH staff team",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/helltaker-hangout/echidna/issues"
+  },
+  "homepage": "https://github.com/helltaker-hangout/echidna#readme"
+}
