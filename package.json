@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npm run build && npm run bot",
+    "build": "tsc --build ./ts",
+    "bot": "node ./js/index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +17,10 @@
   "bugs": {
     "url": "https://github.com/helltaker-hangout/echidna/issues"
   },
-  "homepage": "https://github.com/helltaker-hangout/echidna#readme"
+  "homepage": "https://github.com/helltaker-hangout/echidna#readme",
+  "dependencies": {
+    "discord.js": "^13.8.1",
+    "dotenv": "^16.0.1"
+  },
+  "type": "module"
 }
