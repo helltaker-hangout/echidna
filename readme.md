@@ -39,3 +39,9 @@ applications (bots): https://discord.com/developers/applications
 HHstaff dev team: https://discord.com/developers/teams
 
 Discord dev docs: https://discord.com/developers/docs/intro
+
+### Used software references
+DiscordSRV (Minecraft plugin): https://github.com/DiscordSRV/DiscordSRV
+
+DJS Library (using NodeJS/TS): https://discord.js.org/
+
