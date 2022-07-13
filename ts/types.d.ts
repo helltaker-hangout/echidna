@@ -8,6 +8,7 @@ declare global {
       prefix: string,
     };
     __dirname: string;
+    cooldowns: Cooldown
   }
 
   interface Command {
@@ -16,6 +17,7 @@ declare global {
     aliases?: string[];
     run: function(_Client, Message, string[]);
     syntax: string;
+    cooldown: number;
   }
 
   interface EventFile {
@@ -26,6 +28,10 @@ declare global {
   interface Warn {
     reason: string,
     id: string
+  }
+
+  interface Cooldown {
+    [command: string]: {[userId: string]: number}
   }
 }
 
