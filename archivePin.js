@@ -13,6 +13,7 @@ client.on('messageCreate', message => {
 		message.channel.messages.fetchPinned()
 		.then(messages => messages.forEach(message => {
 			client.channels.fetch(pinChannel).then(channel => channel.send(`(${message.id}) ${message.author} [${message.createdAt}]: ${message.content}`));
+			//message.pin();
 		}))
 		.catch(console.error);
 		
