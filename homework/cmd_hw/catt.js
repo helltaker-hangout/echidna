@@ -2,6 +2,8 @@ module.exports = {
     name: 'catt',
     description: "removes the catt role and give it back after a defined delay",
     execute(message, args){
+	if(message.member.roles.cache.has('931329640914616320')){
+		
 		//let userId = args[0];
 		let catDuration = args[1];
 		const logChan = '737631798921527366';
@@ -24,6 +26,9 @@ module.exports = {
 		})
 		
 		
-		
+	} else {
+			message.channel.send('you do not have the permission to execute that command');
+			
+		}
     }
 }
