@@ -4,8 +4,8 @@ module.exports = {
     execute(message, args){
 		//let userId = args[0];
 		let catDuration = args[1];
-		const logChan = '';
-		const catRole = '';
+		const logChan = '737631798921527366';
+		const catRole = '951376685247365121';
 		let logMsg = `moderator: ${message.author} removed the catt role from ${member} for ${catDuration}`;
 		
 		message.mentions.members.forEach(member => {
@@ -17,13 +17,6 @@ module.exports = {
 				member.roles.add(catRole, 'giving the role back');
 				
 			}, catDuration);
-			
-			
-			
-			
-			// logging actions in #logs channel
-			const channel = client.channels.cache.get('id');
-			channel.send('content');
 			
 		})
 		
