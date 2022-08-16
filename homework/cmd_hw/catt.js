@@ -6,11 +6,14 @@ module.exports = {
 		let catDuration = args[1];
 		const logChan = '737631798921527366';
 		const catRole = '951376685247365121';
-		let logMsg = `moderator: ${message.author} removed the catt role from ${member} for ${catDuration}`;
+		
 		
 		message.mentions.members.forEach(member => {
+			let logMsg = `moderator: ${message.author} removed the catt role from ${member} for ${catDuration}`;
+			//const client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
 			member.roles.remove(catRole, logMsg);
-			client.channels.fetch(logChan).then(channel => channel.send(logMsg));
+			//client.channels.fetch(logChan).then(channel => channel.send(logMsg));
+			message.reply('done!!');
 			
 			//timeout in miliseconds
 			setTimeout(() => { 
