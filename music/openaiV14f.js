@@ -50,15 +50,15 @@ client.on('messageCreate', async message => {
       return message.reply('There was an error while trying to play this song!');
     }
 
+    player.on(AudioPlayerStatus.Idle, () => {
+      const resource = createAudioResource(stream, { inputType: StreamType.Opus });
+      player.play(resource);
+    });
+
     const resource = createAudioResource(stream, { inputType: StreamType.Opus });
     player.play(resource);
 
-    player.on(AudioPlayerStatus.Idle, () => {
-      connection.destroy();
-      message.reply('Finished playing the music!');
-    });
-
-    message.reply(`Now playing: title`);
+    message.reply(`Now playing: ${stream.videoDetails.title}`);
   }
 
   if (command === 'stop') {
@@ -70,4 +70,4 @@ client.on('messageCreate', async message => {
   }
 });
 
-client.login("");
+client.login('your-bot-token');
