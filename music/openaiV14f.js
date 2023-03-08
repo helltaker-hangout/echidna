@@ -58,7 +58,7 @@ client.on('messageCreate', async message => {
     const resource = createAudioResource(stream, { inputType: StreamType.Opus });
     player.play(resource);
 
-    message.reply(`Now playing: ${stream.videoDetails.title}`);
+    message.reply(`Now playing: title`);
   }
 
   if (command === 'stop') {
