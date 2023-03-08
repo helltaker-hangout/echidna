@@ -1,17 +1,19 @@
 //test of an openAI generated JS for a discord music bot with v14
-//const { Client, Intents } = require('discord.js');
-const { Client, Events, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits } = require('discord.js');
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMessages,
-		GatewayIntentBits.MessageContent
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildVoiceStates
 	] 
 });
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, StreamType } = require('@discordjs/voice');
+
+//const { Client, Intents } = require('discord.js');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, StreamType, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core-discord');
 
-//const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+//const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 const prefix = '!'; // Change this to your desired command prefix
 
 client.once('ready', () => {
@@ -33,6 +35,10 @@ client.on('messageCreate', async message => {
       adapterCreator: message.guild.voiceAdapterCreator
     });
 
+    connection.on(VoiceConnectionStatus.Disconnected, () => {
+      message.reply('Disconnected from the voice channel!');
+    });
+
     const player = createAudioPlayer();
     connection.subscribe(player);
 
@@ -47,8 +53,12 @@ client.on('messageCreate', async message => {
     const resource = createAudioResource(stream, { inputType: StreamType.Opus });
     player.play(resource);
 
-    //message.reply(`Now playing: ${stream.videoDetails.title}`);
-	message.reply(`Now playing: your music`);
+    player.on(AudioPlayerStatus.Idle, () => {
+      connection.destroy();
+      message.reply('Finished playing the music!');
+    });
+
+    message.reply(`Now playing: title`);
   }
 
   if (command === 'stop') {
