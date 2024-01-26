@@ -1,9 +1,5 @@
 # Echidna Discord Bot
 
-## Preliminaries
-
-Azure DevOps repo: http://dev.azure.com/helltaker/echidna
-
 ## Setup
 
 Node.js is required, at least version 12.
