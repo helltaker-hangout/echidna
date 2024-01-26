@@ -1,6 +1,7 @@
 const { SlashCommandBuilder} = require('discord.js');
 
 module.exports = {
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('user')
         .setDescription('Provides information about the user.')
@@ -15,6 +16,10 @@ module.exports = {
         // Get the mentioned user or use the command author if no user is mentioned
         const targetUser = interaction.options.getMember('user') || interaction.member;
 
-        await interaction.reply(`User: ${targetUser.user.username}\nJoined Server: ${targetUser.joinedAt}\nJoined Discord: ${targetUser.user.createdAt}`);
+        await interaction.reply(`User: ${targetUser.user.username}
+Joined Server: ${targetUser.joinedAt}
+Joined Discord: ${targetUser.user.createdAt}
+Avatar String: ${targetUser.user.avatar}
+        `);
     },
 };
