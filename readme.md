@@ -2,7 +2,9 @@
 
 ## Introduction
 
-Each branch contains specific code coded for a purpose or by each person.
+Some code is also mirrored on Azure DevOps: https://dev.azure.com/helltaker/echidna
+
+Each branch contains specific code coded for a purpose or by each person, please find the old main branch redacted by Spinge under the spinge branch.
 
 
 ### Used software references
