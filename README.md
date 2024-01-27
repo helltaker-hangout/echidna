@@ -1,5 +1,7 @@
-# echidna - LEGACY
+# echidna - LEGACY (lemonlime's)
 discord bot for minecraft Echidna
+
+Lemonlime's legacy branch.
 
 Legacy branch for singular legacy JavaScript autonomous .js files etc. For archives references purposes.
 
