@@ -70,4 +70,4 @@ client.on('messageCreate', message => {
 })
 
 // token for HH Echidna 
-client.login
+client.login('token-here');
