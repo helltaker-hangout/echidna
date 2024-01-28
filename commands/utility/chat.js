@@ -1,5 +1,9 @@
-const { SlashCommandBuilder,EmbedBuilder  } = require('discord.js');
-const { guildId } = require('../../config.json')
+const fs = require('fs');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { guildId } = require('../../config.json');
+
+const fileLocation = 'commands/utility/pinned-message-ids.txt';
+const isEmpty = val => val == null || !(Object.keys(val) || val).length;
 
 module.exports = {
     category: 'utility',
@@ -9,55 +13,91 @@ module.exports = {
         .addChannelOption(option =>
             option.setName('chat')
                 .setDescription('Chat to return pinned')
+                .setRequired(true))
+        .addChannelOption(option =>
+            option.setName('destination')
+                .setDescription('Channel to send collected messages')
                 .setRequired(true)),
     async execute(interaction) {
-        //        interaction.client.messages = new Collection();
+        let amount = 0;
         const channelId = interaction.options.getChannel('chat')?.id;
-        const guild = await interaction.client.guilds.fetch(guildId);
-        const channel = guild.channels.cache.get(channelId); 
-        if (channel) {
-            const pinnedMessages = await channel.messages.fetchPinned();
-            //pinnedMessages.forEach((pinnedMessage) => {
-            for await (const prepared of pinnedMessages){
-            const pinnedMessage=prepared[1]
-            //console.log(pinnedMessage);
+        const destinationChannelId = interaction.options.getChannel('destination')?.id;
 
-            const embed = new EmbedBuilder()
-            .setTitle(`Pinned Message in #${channel.name}`)
-            .setColor('#3498db') // You can set the color according to your preference    
-            .setAuthor({name:pinnedMessage.author.tag,iconURL:pinnedMessage.author.displayAvatarURL()})
-            .setDescription(pinnedMessage.content)
-            .setTimestamp(pinnedMessage.createdTimestamp)
-            //.setFooter({text:pinnedMessage.createdAt.toString()})
-            if (pinnedMessage.attachments.size > 0) {
-                const attachment = pinnedMessage.attachments.first();
-                // Add the image to the embed as a field
-                embed.setImage(attachment.url);
-              }
-            if (pinnedMessage.type == 19)
-            {
-                const repliedto= await channel.messages.fetch(pinnedMessage.reference.messageId);
-                //console.log(pinnedMessage.reference)
-                //console.log(repliedto);
-                const replyembed = new EmbedBuilder()
-                .setTitle(`Replied to`)
-                .setColor('#3498db') // You can set the color according to your preference    
-                .setAuthor({name:repliedto.author.tag,iconURL:repliedto.author.displayAvatarURL()})
-                .setDescription(repliedto.content)
-                .setTimestamp(repliedto.createdTimestamp)
-                //.setFooter({text:repliedto.createdAt.toString()})
-                if (repliedto.attachments.size > 0) {
-                    const repAttach = repliedto.attachments.first();
-                    // Add the image to the embed as a field
-                    replyembed.setImage(repAttach.url);
-                  }
-                interaction.channel.send({embeds: [replyembed]});
+        const guild = await interaction.client.guilds.fetch(guildId);
+        const channel = guild.channels.cache.get(channelId);
+        const destinationChannel = guild.channels.cache.get(destinationChannelId);
+
+        if (channel && destinationChannel) {
+            const pinnedMessages = await channel.messages.fetchPinned();
+
+            // Read existing IDs from file or initialize an empty array
+            let existingIDs = [];
+            try {
+                const data = fs.readFileSync(fileLocation, 'utf8');
+                existingIDs = data.split('\n').map(id => id.trim());
+            } catch (error) {
+                console.error('Error reading file:', error);
             }
-            console.log(`Pinned Message: ${pinnedMessage.content}`);
-            interaction.channel.send({embeds: [embed]});
-        };
-            await interaction.reply('Pinned messages fetched successfully.');
-        }else 
-        await interaction.reply(`This is not a valid channel`)
+
+            // Filter out duplicates and save new IDs
+            const newMessageIDs = pinnedMessages
+                .filter(pinnedMessage => !existingIDs.includes(pinnedMessage.id))
+                .map(pinnedMessage => pinnedMessage.id);
+
+            // Save new IDs to the file
+            if (!isEmpty(newMessageIDs)) {
+                fs.appendFileSync(fileLocation, newMessageIDs.join('\n')+'\n' );
+                // Process each message
+                for (const [messageId, pinnedMessage] of pinnedMessages) {
+                    // Check if the message ID is a new one
+                    if (!newMessageIDs.includes(messageId)) {
+                        continue; // Skip duplicates
+                    };
+                    if(pinnedMessage.content==''){
+                        continue; // Skip stickers
+                    };
+                    amount++;
+                    const embed = new EmbedBuilder()
+                        //.setTitle(`Pinned Message in #${channel.name}`)
+                        .setURL(pinnedMessage.url)
+                        .setColor('#3498db')
+                        .setAuthor({ name: pinnedMessage.author.tag, iconURL: pinnedMessage.author.displayAvatarURL() })
+                        .setDescription(pinnedMessage.content)
+                        .setTimestamp(pinnedMessage.createdTimestamp)
+
+                    if (pinnedMessage.attachments.size > 0) {
+                        const attachment = pinnedMessage.attachments.first();
+                        embed.setImage(attachment.url);
+                    }
+
+                    if (pinnedMessage.type === 19) {
+                        const repliedTo = await channel.messages.fetch(pinnedMessage.reference.messageId);
+                        const replyEmbed = new EmbedBuilder()
+                            //.setTitle(`Replied to`)
+                            .setURL(repliedTo.url)
+                            .setColor('#3498db')
+                            .setAuthor({ name: repliedTo.author.tag, iconURL: repliedTo.author.displayAvatarURL() })
+                            .setDescription(repliedTo.content)
+                            .setTimestamp(repliedTo.createdTimestamp)
+
+                        if (repliedTo.attachments.size > 0) {
+                            const repAttach = repliedTo.attachments.first();
+                            replyEmbed.setImage(repAttach.url);
+                        }
+                        destinationChannel.send({
+                        content: 'Replied to',
+                        embeds: [replyEmbed] }
+                        );
+                    }
+                    destinationChannel.send({
+                    content: `Pinned message in ${channel.url}`,
+                    embeds: [embed] }
+                    );
+                }
+            }
+            await interaction.reply(`Total of ${amount} message(s) have been fetched and sent to ${destinationChannel}`);
+        } else {
+            await interaction.reply(`Invalid channel(s) specified`);
+        }
     }
 };
