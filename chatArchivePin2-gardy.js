@@ -20,9 +20,9 @@ client.on('messageCreate', message => {
 			const channel = guild.channels.cache.get(message.channelId); 
  
 			if (channel) {
-				const pinnedMessages = await channel.messages.fetchPinned();
+				const pinnedMessages = channel.messages.fetchPinned();
 				//pinnedMessages.forEach((pinnedMessage) => {
-				for await (const prepared of pinnedMessages){
+				for (const prepared of pinnedMessages){
 				const pinnedMessage=prepared[1]
 				//console.log(pinnedMessage);
 	
@@ -40,7 +40,7 @@ client.on('messageCreate', message => {
 				  }
 				if (pinnedMessage.type == 19)
 				{
-					const repliedto= await channel.messages.fetch(pinnedMessage.reference.messageId);
+					const repliedto= channel.messages.fetch(pinnedMessage.reference.messageId);
 					//console.log(pinnedMessage.reference)
 					//console.log(repliedto);
 					const replyembed = new EmbedBuilder()
@@ -60,9 +60,9 @@ client.on('messageCreate', message => {
 				console.log(`Pinned Message: ${pinnedMessage.content}`);
 				message.channel.send({embeds: [embed]});
 			};
-				await message.reply('Pinned messages fetched successfully.');
+				message.reply('Pinned messages fetched successfully.');
 			}else 
-			await message.reply(`This is not a valid channel`)
+			message.reply(`This is not a valid channel`)
 
 
 	
