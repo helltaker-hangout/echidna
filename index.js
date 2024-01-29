@@ -7,7 +7,8 @@ const client = new Client({ intents: [
     GatewayIntentBits.Guilds, 
     GatewayIntentBits.GuildMessages, 
     GatewayIntentBits.MessageContent,
-	GatewayIntentBits.DirectMessages]
+	GatewayIntentBits.DirectMessages,
+	GatewayIntentBits.GuildMembers]
  });
 
 client.commands = new Collection();
@@ -33,6 +34,7 @@ const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of eventFiles) {
+	if(file == 'messageListener.js') continue;
 	const filePath = path.join(eventsPath, file);
 	const event = require(filePath);
 	if (event.once) {

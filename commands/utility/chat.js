@@ -4,6 +4,8 @@ const { guildId } = require('../../config.json');
 
 const fileLocation = 'commands/utility/pinned-message-ids.txt';
 const isEmpty = val => val == null || !(Object.keys(val) || val).length;
+let embedcollect = new Map();
+let replycollect = new Map();
 
 module.exports = {
     category: 'utility',
@@ -46,15 +48,12 @@ module.exports = {
 
             // Save new IDs to the file
             if (!isEmpty(newMessageIDs)) {
-                fs.appendFileSync(fileLocation, newMessageIDs.join('\n')+'\n' );
+                fs.appendFileSync(fileLocation, newMessageIDs.join('\n') + '\n');
                 // Process each message
                 for (const [messageId, pinnedMessage] of pinnedMessages) {
                     // Check if the message ID is a new one
                     if (!newMessageIDs.includes(messageId)) {
                         continue; // Skip duplicates
-                    };
-                    if(pinnedMessage.content==''){
-                        continue; // Skip stickers
                     };
                     amount++;
                     const embed = new EmbedBuilder()
@@ -62,14 +61,19 @@ module.exports = {
                         .setURL(pinnedMessage.url)
                         .setColor('#3498db')
                         .setAuthor({ name: pinnedMessage.author.tag, iconURL: pinnedMessage.author.displayAvatarURL() })
-                        .setDescription(pinnedMessage.content)
                         .setTimestamp(pinnedMessage.createdTimestamp)
-
-                    if (pinnedMessage.attachments.size > 0) {
-                        const attachment = pinnedMessage.attachments.first();
-                        embed.setImage(attachment.url);
+                    if (pinnedMessage.content.length >= 1) {
+                        embed.setDescription(pinnedMessage.content);
                     }
-
+                    if (pinnedMessage.attachments.size > 0) {
+                        attch = pinnedMessage.attachments.first();
+                        let attch_type = attch.contentType.split('/');
+                        if (attch_type == 'video') {
+                            embed.addFields({ name: 'video', value: attach.url });
+                        } else {
+                            embed.setImage(attch.url);
+                        }
+                    }
                     if (pinnedMessage.type === 19) {
                         const repliedTo = await channel.messages.fetch(pinnedMessage.reference.messageId);
                         const replyEmbed = new EmbedBuilder()
@@ -77,27 +81,40 @@ module.exports = {
                             .setURL(repliedTo.url)
                             .setColor('#3498db')
                             .setAuthor({ name: repliedTo.author.tag, iconURL: repliedTo.author.displayAvatarURL() })
-                            .setDescription(repliedTo.content)
                             .setTimestamp(repliedTo.createdTimestamp)
-
-                        if (repliedTo.attachments.size > 0) {
-                            const repAttach = repliedTo.attachments.first();
-                            replyEmbed.setImage(repAttach.url);
+                        if (repliedTo.content.length >= 1) {
+                            replyEmbed.setDescription(repliedTo.content);
                         }
-                        destinationChannel.send({
-                        content: 'Replied to',
-                        embeds: [replyEmbed] }
-                        );
+                        if (repliedTo.attachments.size > 0) {
+                            attch = repliedTo.attachments.first();
+                            let attch_type = attch.contentType.split('/');
+                            console.log(attch.contentType);
+                            if (attch_type == 'video') {
+                                embed.addFields({ name: 'video', value: attach.url });
+                            } else {
+                                embed.setImage(attch.url);
+                            }
+                        }
+                        replycollect.set(amount, replyEmbed);
                     }
-                    destinationChannel.send({
-                    content: `Pinned message in ${channel.url}`,
-                    embeds: [embed] }
-                    );
+                    embedcollect.set(amount, embed);
                 }
             }
             await interaction.reply(`Total of ${amount} message(s) have been fetched and sent to ${destinationChannel}`);
         } else {
             await interaction.reply(`Invalid channel(s) specified`);
         }
+        for (let i = 1; i <= amount; i++) {
+            if(replyembed.has(amount))
+            destinationChannel.send({
+                content: 'Replied to',
+                embeds: [replyEmbed[i]]
+            });
+            destinationChannel.send({
+                content: `Pinned message in ${channel.url}`,
+                embeds: [embed[i]]
+            });
+        }
+        await interaction.reply(`Waiting`);
     }
 };

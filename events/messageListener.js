@@ -1,13 +1,14 @@
 const { Events } = require('discord.js');
-
+// https?:\/\/(?:twitter|x)\.com\/\S+ 
+// regex for twitter.com/x.com
 // Export the event listener function
 module.exports = {
-    name: Events.MessageCreate,
+    name: 'fixup',
     once: false,
     async execute(message) {
         // Check if the message author is a bot
         if (message.author.bot) return;
-
+        if(message.member.roles.cache.get('951376685247365121'))return;
         // Check if the message content includes a specific link
         const xLink = 'https://x.com/';
         const twitterLink = 'https://twitter.com/';
