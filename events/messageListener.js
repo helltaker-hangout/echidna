@@ -1,4 +1,3 @@
-const { Events } = require('discord.js');
 // https?:\/\/(?:twitter|x)\.com\/\S+ 
 // regex for twitter.com/x.com
 // Export the event listener function

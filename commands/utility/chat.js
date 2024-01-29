@@ -6,6 +6,7 @@ const fileLocation = 'commands/utility/pinned-message-ids.txt';
 const isEmpty = val => val == null || !(Object.keys(val) || val).length;
 let embedcollect = new Map();
 let replycollect = new Map();
+let replies = new Map();
 
 module.exports = {
     category: 'utility',
@@ -50,6 +51,13 @@ module.exports = {
             if (!isEmpty(newMessageIDs)) {
                 fs.appendFileSync(fileLocation, newMessageIDs.join('\n') + '\n');
                 // Process each message
+                await interaction.reply('Please be patient.')
+
+                for (const [messageId, pinnedMessage] of pinnedMessages) {
+                    if (pinnedMessage.type === 19) {
+                        replies.set(messageId, await channel.messages.fetch(pinnedMessage.reference.messageId));
+                    }
+                }
                 for (const [messageId, pinnedMessage] of pinnedMessages) {
                     // Check if the message ID is a new one
                     if (!newMessageIDs.includes(messageId)) {
@@ -67,15 +75,15 @@ module.exports = {
                     }
                     if (pinnedMessage.attachments.size > 0) {
                         attch = pinnedMessage.attachments.first();
-                        let attch_type = attch.contentType.split('/');
-                        if (attch_type == 'video') {
-                            embed.addFields({ name: 'video', value: attach.url });
+                        attch_type = attch.contentType.split('/');
+                        if (attch_type[0] == 'video') {
+                            embed.addFields({name:`Video`,value:`[Link to video](${attch.url})`});
                         } else {
                             embed.setImage(attch.url);
                         }
                     }
                     if (pinnedMessage.type === 19) {
-                        const repliedTo = await channel.messages.fetch(pinnedMessage.reference.messageId);
+                        const repliedTo = replies.get(messageId);
                         const replyEmbed = new EmbedBuilder()
                             //.setTitle(`Replied to`)
                             .setURL(repliedTo.url)
@@ -87,34 +95,34 @@ module.exports = {
                         }
                         if (repliedTo.attachments.size > 0) {
                             attch = repliedTo.attachments.first();
-                            let attch_type = attch.contentType.split('/');
-                            console.log(attch.contentType);
-                            if (attch_type == 'video') {
-                                embed.addFields({ name: 'video', value: attach.url });
+                            attch_type = attch.contentType.split('/');
+                            if (attch_type[0] == 'video') {
+                                replyEmbed.addFields({name:`Video`,value:`[Link to video](${attch.url})`});
                             } else {
-                                embed.setImage(attch.url);
+                                replyEmbed.setImage(attch.attachment);
                             }
                         }
                         replycollect.set(amount, replyEmbed);
                     }
                     embedcollect.set(amount, embed);
                 }
+                //await interaction.reply(`Total of ${amount} message(s) have been fetched and sent to ${destinationChannel}`);
+            } else {
+                //await interaction.reply(`Invalid channel(s) specified`);
             }
-            await interaction.reply(`Total of ${amount} message(s) have been fetched and sent to ${destinationChannel}`);
-        } else {
-            await interaction.reply(`Invalid channel(s) specified`);
+            for (let i = 1; i <= amount; i++) {
+                if (replycollect.has(amount))
+                    destinationChannel.send({
+                        content: 'Replied to',
+                        embeds: [replycollect.get(i)]
+                    });
+                destinationChannel.send({
+                    content: `Pinned message in ${channel.url}`,
+                    embeds: [embedcollect.get(i)]
+                });
+            }
+            //await interaction.reply(`Waiting`);
+            destinationChannel.send(`Total of ${amount} message(s) have been fetched and sent to ${destinationChannel}`);
         }
-        for (let i = 1; i <= amount; i++) {
-            if(replyembed.has(amount))
-            destinationChannel.send({
-                content: 'Replied to',
-                embeds: [replyEmbed[i]]
-            });
-            destinationChannel.send({
-                content: `Pinned message in ${channel.url}`,
-                embeds: [embed[i]]
-            });
-        }
-        await interaction.reply(`Waiting`);
     }
 };
