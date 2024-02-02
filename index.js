@@ -8,7 +8,8 @@ const client = new Client({ intents: [
     GatewayIntentBits.GuildMessages, 
     GatewayIntentBits.MessageContent,
 	GatewayIntentBits.DirectMessages,
-	GatewayIntentBits.GuildMembers]
+	GatewayIntentBits.GuildMembers,
+	GatewayIntentBits.GuildMessageReactions]
  });
 
 client.commands = new Collection();

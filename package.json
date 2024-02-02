@@ -20,6 +20,7 @@
   "homepage": "https://github.com/helltaker-hangout/echidna#readme",
   "dependencies": {
     "@discordjs/rest": "^2.2.0",
+    "cron": "^3.1.6",
     "discord-api-types": "^0.37.67",
     "discord.js": "^14.14.1",
     "dotenv": "^16.0.1"
